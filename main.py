@@ -5,7 +5,7 @@ from random import choice
 def start(category):
     source = getSourceByCategory(category)
     if len(source) > 0: 
-        selenium = Selenium(source)
+        selenium = Selenium(source[0])
         selenium.run()
 
 category = choice([
