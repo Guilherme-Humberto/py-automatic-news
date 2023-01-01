@@ -1,24 +1,21 @@
-from string import Template
 from email.message import Message
-from typing import TypedDict
-from src.config import envs
 from smtplib import SMTP
+from string import Template
 
-class EmailConfig(TypedDict):
-    From: str
-    To: str
-    Subject: str
+from src.config import envs
 
-class SmtpServer(TypedDict):
-    From: str
-    To: str
 
 class Email:
-    def __init__(self, templatePath, config: EmailConfig): 
+    def __init__(self, templatePath, config):
         self.templatePath = templatePath
         self.emailFrom = config['From']
         self.emailTo = config['To']
         self.emailSubject = config['Subject']
+
+    def configBaseHtmlTemplate(self, emailBody):
+        with open(envs.basePath, 'r', encoding='utf-8') as html:
+            htmlTemplate = Template(html.read())
+            return htmlTemplate.safe_substitute(email=emailBody)
 
     def configEmailMessage(self, payload: str):
         message = Message()
@@ -29,19 +26,25 @@ class Email:
         message.set_payload(payload)
         return message
 
-    def createPayloadTemplate(self, newsData):
+    def createEmailHtmlTemplate(self, postData):
         with open(self.templatePath, 'r', encoding='utf-8') as html:
             htmlTemplate = Template(html.read())
 
             return htmlTemplate.safe_substitute(
                 subject=self.emailSubject,
-                title=newsData['title'],
-                url=newsData['url']
+                title=postData['title'],
+                url=postData['url'],
+                excerpt=postData['excerpt']
             )
 
-    def sendEmail(self, payloadMessage):
+    def sendEmail(self, payload):
         with SMTP(host=envs.smtpHost, port=envs.smtpPort) as smtp:
             smtp.starttls()
             smtp.login(user=envs.emailLogin, password=envs.emailPassword)
-            msg=payloadMessage.as_string().encode('utf-8')
-            smtp.sendmail(from_addr=self.emailFrom, to_addrs=self.emailTo, msg=msg)
+            msg = payload.as_string().encode('utf-8')
+            smtp.sendmail(
+                msg=msg,
+                to_addrs=self.emailTo,
+                from_addr=self.emailFrom
+            )
+            print('Email enviado com sucesso!! 🚀')

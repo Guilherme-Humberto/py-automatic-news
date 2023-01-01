@@ -3,3 +3,4 @@ __pycache__/
 venv/
 chromedriver.exe
 README.MD
+**.log

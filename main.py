@@ -1,16 +1,15 @@
-from src.selenium import Selenium
-from src.sources import getSourceByCategory
 from random import choice
 
+from src.config import sources
+from src.start import Selenium
+
+
 def start(category):
-    source = getSourceByCategory(category)
-    if len(source) > 0: 
+    source = sources.getSource(category)
+    if len(source) > 0:
         selenium = Selenium(source[0])
         selenium.run()
 
-category = choice([
-    'sports', 
-    'culture', 
-    'policy'
-])
+
+category = choice(['sports', 'culture'])
 start(category)
