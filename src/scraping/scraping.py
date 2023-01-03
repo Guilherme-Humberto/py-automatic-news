@@ -1,13 +1,16 @@
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
+
+from src.scraping.driver import Driver
 
 
 class WebScraping:
     def __init__(self, url):
         self.url = url
         self.posts = []
-        self.driver = Firefox()
+        self.driver = Driver().driver
 
     def findElements(self, by, ref, element):
         try:
